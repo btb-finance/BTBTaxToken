@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
@@ -22,10 +23,6 @@ contract BTBTaxTokenFuzzTest is Test {
 
         btb = new MockBTB();
         btbt = new BTBTaxToken(owner, address(btb), taxCollector);
-
-        // Initialize the contract with 1M BTB/BTBT
-        btb.approve(address(btbt), btbt.INITIAL_BTB_AMOUNT());
-        btbt.initialize();
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -43,20 +40,18 @@ contract BTBTaxTokenFuzzTest is Test {
         btb.approve(address(btbt), amount);
 
         uint256 initialPrice = btbt.getCurrentPrice();
-        uint256 initialContractBtb = btb.balanceOf(address(btbt));
         uint256 btbtAmount = btbt.mint(amount);
         vm.stopPrank();
 
         // Verify BTBT amount is correct based on price
         assertEq(btbtAmount, (amount * 1e18) / initialPrice);
         assertEq(btbt.balanceOf(user), btbtAmount);
-        assertEq(btb.balanceOf(address(btbt)), initialContractBtb + amount); // Account for initial liquidity
+        assertEq(btb.balanceOf(address(btbt)), amount);
     }
 
     function testFuzz_Mint_MultipleMints(uint256 amount1, uint256 amount2) public {
-        // Increase minimum to avoid "BTBT amount too small" errors
-        amount1 = bound(amount1, 1000, 1_000_000 ether);
-        amount2 = bound(amount2, 1000, 1_000_000 ether);
+        amount1 = bound(amount1, 1, 1_000_000 ether);
+        amount2 = bound(amount2, 1, 1_000_000 ether);
 
         address user = makeAddr("user");
         btb.mint(user, amount1 + amount2);
@@ -211,8 +206,8 @@ contract BTBTaxTokenFuzzTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     function testFuzz_PriceIncrease_AfterBurn(uint256 mintAmount, uint256 burnAmount) public {
-        mintAmount = bound(mintAmount, 10_000 ether, 1_000_000 ether);
-        burnAmount = bound(burnAmount, 1000 ether, mintAmount / 2);
+        mintAmount = bound(mintAmount, 1000, 1_000_000 ether);
+        burnAmount = bound(burnAmount, 1, mintAmount / 2);
 
         address user = makeAddr("user");
         btb.mint(user, mintAmount);
@@ -226,7 +221,7 @@ contract BTBTaxTokenFuzzTest is Test {
         uint256 priceAfter = btbt.getCurrentPrice();
         vm.stopPrank();
 
-        // Price should increase after burning (use >= to handle rounding)
+        // Price should increase after burning
         assertGt(priceAfter, priceBefore);
     }
 
@@ -300,8 +295,8 @@ contract BTBTaxTokenFuzzTest is Test {
             vm.stopPrank();
         }
 
-        // Total supply should equal sum of all balances (including owner's initial + tax collector)
-        uint256 totalBalances = totalMinted + btbt.balanceOf(taxCollector) + btbt.balanceOf(owner);
+        // Total supply should equal sum of all balances (plus tax collector)
+        uint256 totalBalances = totalMinted + btbt.balanceOf(taxCollector);
         assertEq(btbt.totalSupply(), totalBalances);
     }
 
@@ -449,8 +444,8 @@ contract BTBTaxTokenFuzzTest is Test {
         uint256 transferAmount = btbt.balanceOf(user1);
         uint256 supplyBefore = btbt.totalSupply();
 
-        (uint256 previewNet, uint256 previewTax, uint256 previewBurn, uint256 previewCollector) =
-            btbt.previewTransfer(transferAmount);
+        (uint256 previewNet, uint256 previewTax, uint256 previewBurn, uint256 previewCollector)
+            = btbt.previewTransfer(transferAmount);
 
         btbt.transfer(user2, transferAmount);
         vm.stopPrank();
