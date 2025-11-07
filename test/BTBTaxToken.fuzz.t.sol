@@ -50,7 +50,7 @@ contract BTBTaxTokenFuzzTest is Test {
         // Verify BTBT amount is correct based on price
         assertEq(btbtAmount, (amount * 1e18) / initialPrice);
         assertEq(btbt.balanceOf(user), btbtAmount);
-        assertEq(btb.balanceOf(address(btbt)), initialContractBtb + amount);  // Account for initial liquidity
+        assertEq(btb.balanceOf(address(btbt)), initialContractBtb + amount); // Account for initial liquidity
     }
 
     function testFuzz_Mint_MultipleMints(uint256 amount1, uint256 amount2) public {
@@ -449,8 +449,8 @@ contract BTBTaxTokenFuzzTest is Test {
         uint256 transferAmount = btbt.balanceOf(user1);
         uint256 supplyBefore = btbt.totalSupply();
 
-        (uint256 previewNet, uint256 previewTax, uint256 previewBurn, uint256 previewCollector)
-            = btbt.previewTransfer(transferAmount);
+        (uint256 previewNet, uint256 previewTax, uint256 previewBurn, uint256 previewCollector) =
+            btbt.previewTransfer(transferAmount);
 
         btbt.transfer(user2, transferAmount);
         vm.stopPrank();

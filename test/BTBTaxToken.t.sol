@@ -24,7 +24,9 @@ contract BTBTaxTokenTest is Test {
     event Minted(address indexed user, uint256 btbAmount, uint256 btbtAmount, uint256 price);
     event Redeemed(address indexed user, uint256 btbtAmount, uint256 btbAmount, uint256 price);
     event TaxCollectorUpdated(address indexed oldCollector, address indexed newCollector);
-    event TaxCollected(address indexed from, address indexed to, uint256 amount, uint256 taxAmount, uint256 burnedAmount);
+    event TaxCollected(
+        address indexed from, address indexed to, uint256 amount, uint256 taxAmount, uint256 burnedAmount
+    );
     event ExclusionUpdated(address indexed account, bool excluded);
 
     function setUp() public {
@@ -292,7 +294,6 @@ contract BTBTaxTokenTest is Test {
         vm.stopPrank();
     }
 
-
     /*//////////////////////////////////////////////////////////////
                         TRANSFER TAX TESTS
     //////////////////////////////////////////////////////////////*/
@@ -533,8 +534,8 @@ contract BTBTaxTokenTest is Test {
     }
 
     function test_PreviewTransfer() public view {
-        (uint256 netAmount, uint256 taxAmount, uint256 burnAmount, uint256 collectorAmount)
-            = btbt.previewTransfer(100 ether);
+        (uint256 netAmount, uint256 taxAmount, uint256 burnAmount, uint256 collectorAmount) =
+            btbt.previewTransfer(100 ether);
 
         assertEq(taxAmount, 1 ether);
         assertEq(burnAmount, 0.5 ether);
