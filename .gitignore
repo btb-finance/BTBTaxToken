@@ -12,3 +12,29 @@ docs/
 
 # Dotenv file
 .env
+
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Foundry
+lcov.info
+forge-snapshots/
+
+# Python (for scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
